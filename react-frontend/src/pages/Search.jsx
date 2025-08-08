@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import ProductCard from '../components/ProductCard';
 import { searchProducts, getAllProducts, authService } from '../services/api';
+
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [allResults, setAllResults] = useState([]);
@@ -17,6 +18,7 @@ const Search = () => {
     priceRange: { min: 0, max: 999999 },
   });
   const [sortBy, setSortBy] = useState('relevance');
+
   useEffect(() => {
     const initialQuery = searchParams.get('query');
     if (initialQuery) {
@@ -26,6 +28,7 @@ const Search = () => {
       loadAllProducts();
     }
   }, []);
+
   const loadAllProducts = async () => {
     setLoading(true);
     setError(null);
@@ -48,6 +51,7 @@ const Search = () => {
       setLoading(false);
     }
   };
+
   const performSearch = async (query) => {
     if (!query.trim()) return;
     if (!authService.isAuthenticated()) {
@@ -122,6 +126,7 @@ const Search = () => {
       setLoading(false);
     }
   };
+
   const filteredAndSortedResults = useMemo(() => {
     if (!Array.isArray(allResults) || allResults.length === 0) {
       return [];
@@ -158,12 +163,14 @@ const Search = () => {
     }
     return filtered;
   }, [allResults, filters, sortBy]);
+
   const clearFilters = () => {
     setFilters({
       priceRange: { min: 0, max: 999999 },
       rating: 0
     });
   };
+
   const handlePriceChange = (type, value) => {
     const numValue = parseInt(value) || 0;
     setFilters(prev => ({
@@ -174,9 +181,11 @@ const Search = () => {
       }
     }));
   };
+
   const handleRatingChange = (rating) => {
     setFilters(prev => ({ ...prev, rating }));
   };
+
   const handleDemoLogin = async () => {
     setLoginLoading(true);
     setLoginError('');
@@ -192,17 +201,20 @@ const Search = () => {
       setLoginLoading(false);
     }
   };
+
   const handleCloseLoginDialog = () => {
     setShowLoginDialog(false);
     setLoginError('');
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
           <SearchBar onSearch={performSearch} initialQuery={activeSearch} />
         </div>
       </div>
+
       {autoAppliedFilters && autoAppliedFilters.length > 0 && (
         <div className="bg-blue-50 border border-blue-200 max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
@@ -227,10 +239,12 @@ const Search = () => {
           </div>
         </div>
       )}
+
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          <div className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 sticky top-24">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          
+          <div className="w-full lg:w-64 lg:flex-shrink-0">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 md:p-6 lg:sticky lg:top-24">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-gray-900">Filters</h2>
                 {(filters.priceRange.min > 0 || filters.priceRange.max < 999999 || filters.rating > 0) && (
@@ -242,6 +256,7 @@ const Search = () => {
                   </button>
                 )}
               </div>
+              
               <div className="mb-6">
                 <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,10 +287,11 @@ const Search = () => {
                   </div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>₹{filters.priceRange.min}</span>
-                  <span>₹{filters.priceRange.max}</span>
+                  <span>₹{filters.priceRange.min.toLocaleString()}</span>
+                  <span>₹{filters.priceRange.max.toLocaleString()}</span>
                 </div>
               </div>
+
               <div>
                 <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,22 +338,23 @@ const Search = () => {
               </div>
             </div>
           </div>
+          
           <div className="flex-1">
             {!loading && filteredAndSortedResults.length > 0 && (
               <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col items-start gap-3 md:flex-row md:justify-between md:items-center">
                   <div className="text-sm text-gray-600">
                     Showing {filteredAndSortedResults.length} of {allResults.length} results
                     {activeSearch && (
                       <span> for "<span className="font-semibold text-gray-900">{activeSearch}</span>"</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full md:w-auto">
                     <span className="text-sm text-gray-600">Sort by:</span>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="border border-gray-200 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="border border-gray-200 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full md:w-auto"
                     >
                       <option value="relevance">Relevance</option>
                       <option value="price_low">Price: Low to High</option>
@@ -348,6 +365,7 @@ const Search = () => {
                 </div>
               </div>
             )}
+
             {loading && (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -356,6 +374,7 @@ const Search = () => {
                 </div>
               </div>
             )}
+
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
                 <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,6 +390,7 @@ const Search = () => {
                 </button>
               </div>
             )}
+
             {!loading && !error && activeSearch && filteredAndSortedResults.length === 0 && allResults.length === 0 && (
               <div className="text-center py-12">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,6 +404,7 @@ const Search = () => {
                 </p>
               </div>
             )}
+
             {!loading && !error && filteredAndSortedResults.length === 0 && allResults.length > 0 && (
               <div className="text-center py-12">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,6 +424,7 @@ const Search = () => {
                 </button>
               </div>
             )}
+
             {!loading && !error && !activeSearch && (
               <div className="text-center py-12">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,22 +434,23 @@ const Search = () => {
                 <p className="text-gray-600">Enter keywords above to find products</p>
               </div>
             )}
+
             {!loading && !error && filteredAndSortedResults.length > 0 && (
               <>
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                     <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 text-center sm:text-left">
                       <h3 className="text-sm font-semibold text-blue-900 mb-1">Smart Review Analysis Available</h3>
                       <p className="text-blue-700 text-sm">
                         Click on any product to view detailed review analysis, sentiment insights, and customer feedback.
                       </p>
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 mt-2 sm:mt-0">
                       <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-blue-300">
                         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -438,6 +461,7 @@ const Search = () => {
                     </div>
                   </div>
                 </div>
+                
                 <div className="space-y-4">
                   {filteredAndSortedResults.map((product) => (
                     <ProductCard key={product._id || product.id} product={product} />
@@ -448,9 +472,10 @@ const Search = () => {
           </div>
         </div>
       </div>
+      
       {showLoginDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 md:p-8 max-w-md w-full mx-auto shadow-2xl">
             <div className="text-center">
               <div className="mb-4">
                 <svg className="w-16 h-16 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -471,7 +496,8 @@ const Search = () => {
                 <p className="text-blue-700 text-sm mb-1">Email: 07ankur007@gmail.com</p>
                 <p className="text-blue-700 text-sm">Password: 1234567</p>
               </div>
-              <div className="flex gap-3">
+              
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleCloseLoginDialog}
                   disabled={loginLoading}
@@ -504,4 +530,5 @@ const Search = () => {
     </div>
   );
 };
+
 export default Search;
